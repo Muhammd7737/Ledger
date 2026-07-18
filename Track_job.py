@@ -336,7 +336,7 @@ def check_username():
 def auth_google():
     result = supabase.auth.sign_in_with_oauth({
         "provider": "google",
-        "options": {"redirect_to": "http://localhost:8080/auth/callback"}
+        "options": {"redirect_to": request.url_root.rstrip('/') + '/auth/callback'}
     })
     return redirect(result.url)
 
