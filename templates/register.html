@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register · Ledger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; background: #0a0a0a; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Animated grid background */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+    }
+
+    /* Slow-drifting orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+      z-index: 0;
+      animation: drift linear infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #3b82f6; top: -100px; left: -100px; animation-duration: 28s; }
+    .orb-2 { width: 400px; height: 400px; background: #6366f1; bottom: -80px; right: -80px; animation-duration: 22s; animation-delay: -10s; }
+    .orb-3 { width: 300px; height: 300px; background: #10b981; top: 40%; left: 55%; animation-duration: 35s; animation-delay: -18s; }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      33%  { transform: translate(30px, -20px) scale(1.04); }
+      66%  { transform: translate(-20px, 30px) scale(0.97); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 10;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    input {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 16px;
+      color: #f5f5f5;
+      outline: none;
+      width: 100%;
+      transition: border-color .2s;
+    }
+    input:focus { border-color: rgba(255,255,255,0.4); }
+    input::placeholder { color: rgba(255,255,255,0.3); }
+    input.input-error { border-color: rgba(239,68,68,0.5); }
+    input.input-ok { border-color: rgba(16,185,129,0.5); }
+
+    .btn {
+      width: 100%;
+      background: white;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: #e5e5e5; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-google {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      color: #f5f5f5;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .btn-google:hover { background: rgba(255,255,255,0.1); }
+    .btn-google:active { transform: scale(0.98); }
+
+    .flash-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+    .flash-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+
+    .divider { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.2); font-size: 12px; }
+    .divider::before, .divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+
+    .username-status { font-size: 12px; margin-top: 4px; min-height: 16px; }
+    .username-status.ok { color: #6ee7b7; }
+    .username-status.taken { color: #fca5a5; }
+
+    .req-list { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 10px; }
+    .req-list span { transition: color .15s; }
+    .req-list span.met { color: #6ee7b7; }
+  </style>
+</head>
+<body class="h-full flex items-center justify-center px-4">
+
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="card w-full max-w-sm p-8" style="z-index:10;">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 mb-4">
+        <svg width="22" height="22" viewBox="0 0 100 100">
+          <path d="M50 10 L50 90" stroke="rgba(255,255,255,0.4)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M50 22 L86 30 L50 38 Z" fill="#3b82f6"/>
+          <path d="M50 46 L78 52 L50 58 Z" fill="rgba(255,255,255,0.8)"/>
+          <circle cx="50" cy="88" r="7" fill="#0a0a0a" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
+        </svg>
+        <span style="font-weight:700; font-size:20px; color:white; letter-spacing:-0.3px;">Ledger</span>
+      </div>
+      <p style="color:rgba(255,255,255,0.4); font-size:14px;">Create your account.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{{ 'flash-error' if category == 'error' else 'flash-success' }} mb-4">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('auth_google') }}" class="btn-google mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.63H1.29A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.29 5.37l3.98-3.09z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"/>
+      </svg>
+      Continue with Google
+    </a>
+
+    <div class="divider mb-4">or</div>
+
+    <form method="post" action="{{ url_for('register') }}" class="space-y-3" id="registerForm">
+      <input type="email" name="email" placeholder="Email" required autocomplete="email" />
+
+      <div>
+        <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
+        <p class="username-status" id="usernameStatus"></p>
+      </div>
+
+      <div>
+        <input type="password" name="password" id="password" placeholder="Password" required autocomplete="new-password" />
+        <div class="req-list" id="reqList">
+          <span data-req="length">8+ characters</span>
+          <span data-req="upper">Uppercase</span>
+          <span data-req="lower">Lowercase</span>
+          <span data-req="digit">Number</span>
+          <span data-req="special">Special character</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" style="margin-top:8px;">Create account</button>
+    </form>
+
+    <p style="text-align:center; font-size:13px; color:rgba(255,255,255,0.35); margin-top:20px;">
+      Already have an account?
+      <a href="{{ url_for('login') }}" style="color:rgba(255,255,255,0.7); text-decoration:underline; text-underline-offset:3px;">Sign in</a>
+    </p>
+  </div>
+
+  <script>
+    // Live username availability check against /check-username
+    const usernameInput = document.getElementById('username');
+    const usernameStatus = document.getElementById('usernameStatus');
+    let usernameTimer = null;
+
+    usernameInput.addEventListener('input', function () {
+      const value = usernameInput.value.trim();
+      clearTimeout(usernameTimer);
+      usernameInput.classList.remove('input-ok', 'input-error');
+      usernameStatus.textContent = '';
+      usernameStatus.className = 'username-status';
+
+      if (!value) return;
+
+      usernameTimer = setTimeout(() => {
+        fetch('/check-username?username=' + encodeURIComponent(value))
+          .then(res => res.json())
+          .then(data => {
+            if (data.available) {
+              usernameInput.classList.add('input-ok');
+              usernameStatus.textContent = 'Username available';
+              usernameStatus.classList.add('ok');
+            } else {
+              usernameInput.classList.add('input-error');
+              usernameStatus.textContent = 'Username already taken';
+              usernameStatus.classList.add('taken');
+            }
+          })
+          .catch(() => { /* silently ignore network hiccups */ });
+      }, 350);
+    });
+
+    // Live password requirement checklist
+    const passwordInput = document.getElementById('password');
+    const reqSpans = document.querySelectorAll('#reqList span');
+
+    passwordInput.addEventListener('input', function () {
+      const val = passwordInput.value;
+      const checks = {
+        length: val.length >= 8,
+        upper: /[A-Z]/.test(val),
+        lower: /[a-z]/.test(val),
+        digit: /[0-9]/.test(val),
+        special: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val)
+      };
+      reqSpans.forEach(span => {
+        const key = span.dataset.req;
+        span.classList.toggle('met', checks[key]);
+      });
+    });
+  </script>
+
+</body>
+</html>
