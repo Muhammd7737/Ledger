@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile · Ledger</title>
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem('ledger-theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = stored ? stored === 'dark' : prefersDark;
+        if (isDark) document.documentElement.classList.add('dark');
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <style>
+    .flash-error {
+      background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+      border-radius: 12px; padding: 10px 14px; font-size: 13px;
+    }
+    .dark .flash-error { background: rgba(220,38,38,0.12); border-color: rgba(220,38,38,0.35); color: #fca5a5; }
+
+    .flash-success {
+      background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857;
+      border-radius: 12px; padding: 10px 14px; font-size: 13px;
+    }
+    .dark .flash-success { background: rgba(5,150,105,0.12); border-color: rgba(5,150,105,0.35); color: #6ee7b7; }
+  </style>
+</head>
+
+<body class="h-full bg-white text-[#37352f] dark:bg-neutral-900 dark:text-neutral-100 transition-colors">
+
+  <nav class="border-b border-neutral-100 dark:border-neutral-800 py-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="mx-auto max-w-7xl px-4 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <a href="{{ url_for('index') }}" class="font-bold text-lg tracking-tight">Ledger</a>
+        <a href="{{ url_for('archived') }}"
+          class="text-sm font-medium text-neutral-400 hover:text-black dark:hover:text-white transition-colors">Archived</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <label class="relative inline-flex items-center cursor-pointer" title="Toggle dark mode">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" class="sr-only peer">
+          <div class="w-11 h-6 bg-neutral-300 dark:bg-neutral-700 rounded-full peer-checked:bg-black dark:peer-checked:bg-white transition-colors"></div>
+          <div class="absolute left-[3px] top-[3px] w-[18px] h-[18px] bg-white dark:bg-neutral-900 rounded-full shadow transition-transform peer-checked:translate-x-5">
+          </div>
+        </label>
+
+        <div class="relative">
+          <button id="profileMenuBtn" onclick="toggleProfileMenu()"
+            class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:border-black dark:hover:border-white transition-colors overflow-hidden">
+            {% if profile and profile.profile_pic %}
+            <img src="{{ profile.profile_pic }}" alt="Profile" class="w-full h-full object-cover" />
+            {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            {% endif %}
+          </button>
+
+          <div id="profileMenu"
+            class="hidden absolute right-0 mt-2 w-40 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-lg overflow-hidden z-50">
+            <a href="{{ url_for('profile') }}"
+              class="block px-4 py-2.5 text-sm text-[#37352f] dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors no-underline">Profile</a>
+            <a href="{{ url_for('logout') }}"
+              class="block px-4 py-2.5 text-sm text-red-500 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors no-underline border-t border-neutral-100 dark:border-neutral-700">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="mx-auto max-w-3xl px-4 py-8">
+
+    <div class="mb-6">
+      <h1 class="text-3xl font-semibold mb-1">Profile</h1>
+      <p class="text-neutral-500 text-sm">Manage your account details.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flex flex-col gap-2 mb-6">
+        {% for category, message in messages %}
+        <div class="{{ 'flash-error' if category == 'error' else 'flash-success' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Profile Picture -->
+    <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-5 shadow-sm mb-4">
+      <div class="flex items-center gap-5">
+        <div class="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+          {% if profile and profile.profile_pic %}
+          <img src="{{ profile.profile_pic }}" alt="Profile" class="w-full h-full object-cover" />
+          {% else %}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" class="text-neutral-300">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          {% endif %}
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-medium mb-1">Profile picture</p>
+          <p class="text-xs text-neutral-400 mb-3">Upload a new photo (max 2MB).</p>
+          <form method="post" action="{{ url_for('update_photo') }}" enctype="multipart/form-data" class="flex items-center gap-2 flex-wrap">
+            <input type="file" name="photo" accept="image/*" required
+              class="text-xs text-neutral-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-neutral-200 dark:file:border-neutral-700 file:bg-neutral-50 dark:file:bg-neutral-900 file:text-xs file:text-black dark:file:text-neutral-100 file:cursor-pointer" />
+            <button type="submit"
+              class="rounded-lg bg-black dark:bg-white text-white dark:text-black px-4 py-1.5 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">Upload</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+
+      <!-- Personal Details -->
+      <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-4">Personal details</p>
+        <form method="post" action="{{ url_for('update_email') }}" class="flex flex-col gap-3">
+          <label class="flex flex-col gap-1">
+            <span class="text-xs text-neutral-400">Email address</span>
+            <input type="email" name="email" value="{{ email or '' }}" required
+              class="rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+          </label>
+          <button type="submit"
+            class="self-start rounded-lg bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">Update email</button>
+        </form>
+      </div>
+
+      <!-- Password Management -->
+      <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-4">Password</p>
+        <form method="post" action="{{ url_for('update_password') }}" class="flex flex-col gap-3" id="passwordForm">
+          <label class="flex flex-col gap-1">
+            <span class="text-xs text-neutral-400">New password</span>
+            <input type="password" name="new_password" id="newPassword" required autocomplete="new-password"
+              class="rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+          </label>
+          <div class="req-list flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-neutral-400" id="reqList">
+            <span data-req="length">8+ characters</span>
+            <span data-req="upper">Uppercase</span>
+            <span data-req="lower">Lowercase</span>
+            <span data-req="digit">Number</span>
+            <span data-req="special">Special character</span>
+          </div>
+          <button type="submit"
+            class="self-start rounded-lg bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">Update password</button>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('hidden');
+    }
+    document.addEventListener('click', function (e) {
+      const menu = document.getElementById('profileMenu');
+      const btn = document.getElementById('profileMenuBtn');
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function toggleDarkMode() {
+      const checkbox = document.getElementById('darkModeToggle');
+      const isDark = checkbox.checked;
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('ledger-theme', isDark ? 'dark' : 'light');
+    }
+    document.getElementById('darkModeToggle').checked = document.documentElement.classList.contains('dark');
+
+    // Live password requirement checklist (mirrors server-side validate_password)
+    const passwordInput = document.getElementById('newPassword');
+    const reqSpans = document.querySelectorAll('#reqList span');
+    passwordInput.addEventListener('input', function () {
+      const val = passwordInput.value;
+      const checks = {
+        length: val.length >= 8,
+        upper: /[A-Z]/.test(val),
+        lower: /[a-z]/.test(val),
+        digit: /[0-9]/.test(val),
+        special: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val)
+      };
+      reqSpans.forEach(span => {
+        span.classList.toggle('met', checks[span.dataset.req]);
+        if (checks[span.dataset.req]) {
+          span.style.color = '#059669';
+        } else {
+          span.style.color = '';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

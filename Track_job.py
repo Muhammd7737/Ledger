@@ -78,6 +78,14 @@ with app.app_context():
     except:
         pass
 
+@app.before_request
+def load_supabase_session():
+    if 'access_token' in session and 'refresh_token' in session:
+        try:
+            supabase.auth.set_session(session['access_token'], session['refresh_token'])
+        except Exception:
+            pass
+
 # ----------Index----------
 @app.route('/')
 def index():
@@ -122,6 +130,8 @@ def index():
     interview_rate = (total_interviews / total_applied * 100) if total_applied > 0 else 0
     offer_rate = (total_offers / total_applied * 100) if total_applied > 0 else 0
     rejected_rate = (total_rejections / total_applied * 100) if total_applied > 0 else 0
+    
+    profile = Profile.query.get(session['id'])
 
     return render_template(
         'index.html',
@@ -239,6 +249,7 @@ def archived():
         return redirect(url_for('login'))
 
     jobs = Job.query.filter_by(archived=True).order_by(Job.id.desc()).all()
+    profile = Profile.query.get(session['id'])
     return render_template('archived.html', jobs=jobs)
 
 # ----------Job deadline----------
@@ -286,6 +297,8 @@ def login():
             session['loggedin'] = True
             session['id'] = result.user.id
             session['email'] = result.user.email
+            session['access_token'] = result.session.access_token
+            session['refresh_token'] = result.session.refresh_token
             return redirect(url_for('index'))
         except Exception:
             flash('Incorrect email or password.', 'error')
@@ -351,6 +364,8 @@ def auth_callback():
         session['loggedin'] = True
         session['id'] = result.user.id
         session['email'] = result.user.email
+        session['access_token'] = result.session.access_token
+        session['refresh_token'] = result.session.refresh_token
         if not Profile.query.get(result.user.id):
             db.session.add(Profile(id=result.user.id, username=result.user.email.split('@')[0]))
             db.session.commit()
@@ -359,6 +374,58 @@ def auth_callback():
         flash(str(e), 'error')
         return redirect(url_for('login'))
 
+# ----------Profile----------
+@app.route('/profile')
+def profile():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    profile_obj = Profile.query.get(session['id'])
+    return render_template('profile.html', email=session.get('email'), profile=profile_obj)
+
+@app.route('/profile/update-email', methods=['POST'])
+def update_email():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    new_email = request.form.get('email', '').strip()
+    try:
+        supabase.auth.update_user({"email": new_email})
+        session['email'] = new_email
+        flash('Confirmation email sent to your new address. Check your inbox to finish the change.', 'success')
+    except Exception as e:
+        flash(str(e), 'error')
+    return redirect(url_for('profile'))
+
+@app.route('/profile/update-password', methods=['POST'])
+def update_password():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    new_password = request.form.get('new_password', '')
+    error = validate_password(new_password)
+    if error:
+        flash(error, 'error')
+        return redirect(url_for('profile'))
+    try:
+        supabase.auth.update_user({"password": new_password})
+        flash('Password updated.', 'success')
+    except Exception as e:
+        flash(str(e), 'error')
+    return redirect(url_for('profile'))
+
+@app.route('/profile/update-photo', methods=['POST'])
+def update_photo():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    file = request.files.get('photo')
+    if file and file.filename:
+        import base64
+        encoded = base64.b64encode(file.read()).decode('utf-8')
+        data_url = f"data:{file.mimetype};base64,{encoded}"
+        profile_obj = Profile.query.get(session['id'])
+        if profile_obj:
+            profile_obj.profile_pic = data_url
+            db.session.commit()
+        flash('Profile picture updated.', 'success')
+    return redirect(url_for('profile'))
 
 if __name__ == '__main__':
     with app.app_context():

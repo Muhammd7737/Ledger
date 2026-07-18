@@ -94,13 +94,35 @@
         <a href="{{ url_for('archived') }}" class="text-sm font-medium text-black dark:text-white transition-colors">Archived</a>
       </div>
       <div class="flex items-center gap-4">
-        <span class="text-xs text-neutral-400 font-mono" id="clock">--:--:--</span>
         <label class="relative inline-flex items-center cursor-pointer" title="Toggle dark mode">
           <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" class="sr-only peer">
           <div class="w-11 h-6 bg-neutral-300 dark:bg-neutral-700 rounded-full peer-checked:bg-black dark:peer-checked:bg-white transition-colors"></div>
           <div class="absolute left-[3px] top-[3px] w-[18px] h-[18px] bg-white dark:bg-neutral-900 rounded-full shadow transition-transform peer-checked:translate-x-5">
           </div>
         </label>
+
+        <div class="relative">
+          <button id="profileMenuBtn" onclick="toggleProfileMenu()"
+            class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:border-black dark:hover:border-white transition-colors overflow-hidden">
+            {% if profile_pic %}
+            <img src="{{ profile_pic }}" alt="Profile" class="w-full h-full object-cover" />
+            {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            {% endif %}
+          </button>
+
+          <div id="profileMenu"
+            class="hidden absolute right-0 mt-2 w-40 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-lg overflow-hidden z-50">
+            <a href="{{ url_for('profile') }}"
+              class="block px-4 py-2.5 text-sm text-[#37352f] dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors no-underline">Profile</a>
+            <a href="{{ url_for('logout') }}"
+              class="block px-4 py-2.5 text-sm text-red-500 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors no-underline border-t border-neutral-100 dark:border-neutral-700">Logout</a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -198,11 +220,16 @@
   </main>
 
   <script>
-    function updateClock() {
-      document.getElementById('clock').textContent = new Date().toTimeString().split(' ')[0];
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('hidden');
     }
-    updateClock();
-    setInterval(updateClock, 1000);
+    document.addEventListener('click', function (e) {
+      const menu = document.getElementById('profileMenu');
+      const btn = document.getElementById('profileMenuBtn');
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
 
     function toggleDarkMode() {
       const checkbox = document.getElementById('darkModeToggle');
