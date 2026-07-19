@@ -407,7 +407,7 @@ def profile():
         if profile_obj:
             profile_obj.email = new_email
             db.session.commit()
-            
+
     email = db.Column(db.String(120), unique=True, nullable=True)
     return render_template('profile.html', email=session.get('email'), profile=profile_obj)
 
@@ -419,6 +419,10 @@ def update_email():
     try:
         supabase.auth.update_user({"email": new_email})
         session['email'] = new_email
+        profile_obj = Profile.query.get(session['id'])
+        if profile_obj:
+            profile_obj.email = new_email
+            db.session.commit()
         flash('Confirmation email sent to your new address. Check your inbox to finish the change.', 'success')
     except Exception as e:
         flash(str(e), 'error')
