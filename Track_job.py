@@ -404,11 +404,6 @@ def profile():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
     profile_obj = Profile.query.get(session['id'])
-        if profile_obj:
-            profile_obj.email = new_email
-            db.session.commit()
-
-    email = db.Column(db.String(120), unique=True, nullable=True)
     return render_template('profile.html', email=session.get('email'), profile=profile_obj)
 
 @app.route('/profile/update-email', methods=['POST'])
