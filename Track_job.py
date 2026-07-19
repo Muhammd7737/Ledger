@@ -307,7 +307,7 @@ def login():
             session['refresh_token'] = result.session.refresh_token
             return redirect(url_for('index'))
         except Exception:
-            flash('Incorrect email or password.', 'error')
+            flash(str(e), 'error')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
