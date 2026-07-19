@@ -18,6 +18,12 @@ supabase: Client = create_client(
     os.environ.get('SUPABASE_URL'),
     os.environ.get('SUPABASE_ANON_KEY')
 )
+
+supabase_admin: Client = create_client(
+    os.environ.get('SUPABASE_URL'),
+    os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+)
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -426,6 +432,26 @@ def update_photo():
             db.session.commit()
         flash('Profile picture updated.', 'success')
     return redirect(url_for('profile'))
+
+# ----------Delete Account----------
+@app.route('/profile/delete-account', methods=['POST'])
+def delete_account():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    user_id = session['id']
+    try:
+        Job.query.filter_by(user_id=user_id).delete()
+        profile_obj = Profile.query.get(user_id)
+        if profile_obj:
+            db.session.delete(profile_obj)
+        db.session.commit()
+        supabase_admin.auth.admin.delete_user(user_id)
+    except Exception as e:
+        flash(str(e), 'error')
+        return redirect(url_for('profile'))
+    session.clear()
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     with app.app_context():

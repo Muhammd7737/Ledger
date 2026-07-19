@@ -6,89 +6,55 @@
   <title>Register · Ledger</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { margin: 0; background: #0a0a0a; font-family: 'Inter', system-ui, sans-serif; }
+    body { margin: 0; background: #ffffff; font-family: 'Inter', system-ui, sans-serif; }
 
-    /* Animated grid background */
-    .bg-grid {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      z-index: 0;
-    }
-
-    /* Slow-drifting orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.12;
-      z-index: 0;
-      animation: drift linear infinite;
-    }
-    .orb-1 { width: 500px; height: 500px; background: #3b82f6; top: -100px; left: -100px; animation-duration: 28s; }
-    .orb-2 { width: 400px; height: 400px; background: #6366f1; bottom: -80px; right: -80px; animation-duration: 22s; animation-delay: -10s; }
-    .orb-3 { width: 300px; height: 300px; background: #10b981; top: 40%; left: 55%; animation-duration: 35s; animation-delay: -18s; }
-
-    @keyframes drift {
-      0%   { transform: translate(0, 0) scale(1); }
-      33%  { transform: translate(30px, -20px) scale(1.04); }
-      66%  { transform: translate(-20px, 30px) scale(0.97); }
-      100% { transform: translate(0, 0) scale(1); }
-    }
-
-    /* Card */
     .card {
-      position: relative;
-      z-index: 10;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
       border-radius: 20px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
+
+    label { font-size: 13px; font-weight: 500; color: #37352f; display: block; margin-bottom: 6px; }
 
     input {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
       border-radius: 12px;
-      padding: 16px 18px;
-      font-size: 16px;
-      color: #f5f5f5;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #171717;
       outline: none;
       width: 100%;
-      transition: border-color .2s;
+      transition: border-color .15s;
     }
-    input:focus { border-color: rgba(255,255,255,0.4); }
-    input::placeholder { color: rgba(255,255,255,0.3); }
-    input.input-error { border-color: rgba(239,68,68,0.5); }
-    input.input-ok { border-color: rgba(16,185,129,0.5); }
+    input:focus { border-color: #171717; }
+    input::placeholder { color: #a3a3a3; }
+    input.input-error { border-color: #ef4444; }
+    input.input-ok { border-color: #10b981; }
 
     .btn {
       width: 100%;
-      background: white;
-      color: #0a0a0a;
+      background: #0a0a0a;
+      color: white;
       border: none;
       border-radius: 12px;
-      padding: 15px;
-      font-size: 15px;
+      padding: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: background .15s, transform .1s;
     }
-    .btn:hover { background: #e5e5e5; }
+    .btn:hover { background: #262626; }
     .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .btn-google {
       width: 100%;
-      background: rgba(255,255,255,0.05);
-      color: #f5f5f5;
-      border: 1px solid rgba(255,255,255,0.14);
+      background: #ffffff;
+      color: #171717;
+      border: 1px solid #e5e5e5;
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -99,54 +65,35 @@
       gap: 10px;
       text-decoration: none;
     }
-    .btn-google:hover { background: rgba(255,255,255,0.1); }
+    .btn-google:hover { background: #fafafa; }
     .btn-google:active { transform: scale(0.98); }
 
-    .flash-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
-    .flash-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+    .flash-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+    .flash-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
 
-    .divider { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.2); font-size: 12px; }
-    .divider::before, .divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+    .divider { display: flex; align-items: center; gap: 12px; color: #d4d4d4; font-size: 12px; }
+    .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e5e5e5; }
 
     .username-status { font-size: 12px; margin-top: 4px; min-height: 16px; }
-    .username-status.ok { color: #6ee7b7; }
-    .username-status.taken { color: #fca5a5; }
+    .username-status.ok { color: #059669; }
+    .username-status.taken { color: #dc2626; }
 
-    .req-list { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 10px; }
-    .req-list span { transition: color .15s; }
-    .req-list span.met { color: #6ee7b7; }
+    .req-list { font-size: 11px; color: #a3a3a3; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 10px; }
+    .req-list span.met { color: #059669; }
   </style>
 </head>
-<body class="h-full flex items-center justify-center px-4">
+<body class="h-full flex items-center justify-center px-4 py-12">
 
-  <div class="bg-grid"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+  <div class="w-full max-w-sm">
 
-  <div class="card w-full max-w-sm p-8" style="z-index:10;">
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-2 mb-4">
-        <svg width="22" height="22" viewBox="0 0 100 100">
-          <path d="M50 10 L50 90" stroke="rgba(255,255,255,0.4)" stroke-width="6" stroke-linecap="round"/>
-          <path d="M50 22 L86 30 L50 38 Z" fill="#3b82f6"/>
-          <path d="M50 46 L78 52 L50 58 Z" fill="rgba(255,255,255,0.8)"/>
-          <circle cx="50" cy="88" r="7" fill="#0a0a0a" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
-        </svg>
-        <span style="font-weight:700; font-size:20px; color:white; letter-spacing:-0.3px;">Ledger</span>
-      </div>
-      <p style="color:rgba(255,255,255,0.4); font-size:14px;">Create your account.</p>
+    <div class="text-center mb-6">
+      <h1 class="font-bold text-3xl tracking-tight text-[#171717] mb-2">Create Account</h1>
+      <p class="text-neutral-500 text-sm">Join Ledger to start tracking your applications.</p>
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="{{ 'flash-error' if category == 'error' else 'flash-success' }} mb-4">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <div class="divider mb-6">or</div>
 
-    <a href="{{ url_for('auth_google') }}" class="btn-google mb-4">
+    <a href="{{ url_for('auth_google') }}" class="btn-google mb-6">
       <svg width="16" height="16" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
@@ -156,38 +103,51 @@
       Continue with Google
     </a>
 
-    <div class="divider mb-4">or</div>
+    <div class="card p-8">
 
-    <form method="post" action="{{ url_for('register') }}" class="space-y-3" id="registerForm">
-      <input type="email" name="email" placeholder="Email" required autocomplete="email" />
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="{{ 'flash-error' if category == 'error' else 'flash-success' }} mb-4">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-      <div>
-        <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
-        <p class="username-status" id="usernameStatus"></p>
-      </div>
-
-      <div>
-        <input type="password" name="password" id="password" placeholder="Password" required autocomplete="new-password" />
-        <div class="req-list" id="reqList">
-          <span data-req="length">8+ characters</span>
-          <span data-req="upper">Uppercase</span>
-          <span data-req="lower">Lowercase</span>
-          <span data-req="digit">Number</span>
-          <span data-req="special">Special character</span>
+      <form method="post" action="{{ url_for('register') }}" class="space-y-4" id="registerForm">
+        <div>
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="choose_username" required autocomplete="username" />
+          <p class="username-status" id="usernameStatus"></p>
         </div>
-      </div>
 
-      <button type="submit" class="btn" style="margin-top:8px;">Create account</button>
-    </form>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@email.com" required autocomplete="email" />
+        </div>
 
-    <p style="text-align:center; font-size:13px; color:rgba(255,255,255,0.35); margin-top:20px;">
-      Already have an account?
-      <a href="{{ url_for('login') }}" style="color:rgba(255,255,255,0.7); text-decoration:underline; text-underline-offset:3px;">Sign in</a>
-    </p>
+        <div>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password" />
+          <div class="req-list" id="reqList">
+            <span data-req="length">8+ characters</span>
+            <span data-req="upper">Uppercase</span>
+            <span data-req="lower">Lowercase</span>
+            <span data-req="digit">Number</span>
+            <span data-req="special">Special character</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn" style="margin-top:4px;">Create Account</button>
+      </form>
+
+      <p class="text-center text-sm text-neutral-500 mt-5">
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="font-semibold text-[#171717] no-underline">Login here</a>
+      </p>
+    </div>
   </div>
 
   <script>
-    // Live username availability check against /check-username
     const usernameInput = document.getElementById('username');
     const usernameStatus = document.getElementById('usernameStatus');
     let usernameTimer = null;
@@ -198,7 +158,6 @@
       usernameInput.classList.remove('input-ok', 'input-error');
       usernameStatus.textContent = '';
       usernameStatus.className = 'username-status';
-
       if (!value) return;
 
       usernameTimer = setTimeout(() => {
@@ -219,10 +178,8 @@
       }, 350);
     });
 
-    // Live password requirement checklist
     const passwordInput = document.getElementById('password');
     const reqSpans = document.querySelectorAll('#reqList span');
-
     passwordInput.addEventListener('input', function () {
       const val = passwordInput.value;
       const checks = {
@@ -232,10 +189,7 @@
         digit: /[0-9]/.test(val),
         special: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val)
       };
-      reqSpans.forEach(span => {
-        const key = span.dataset.req;
-        span.classList.toggle('met', checks[key]);
-      });
+      reqSpans.forEach(span => span.classList.toggle('met', checks[span.dataset.req]));
     });
   </script>
 
