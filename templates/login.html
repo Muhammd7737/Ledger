@@ -21,8 +21,8 @@
       background: #fafafa;
       border: 1px solid #e5e5e5;
       border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 14px;
+      padding: 16px 18px;
+      font-size: 16px;
       color: #171717;
       outline: none;
       width: 100%;
@@ -95,8 +95,8 @@
 
       <form method="post" action="{{ url_for('login') }}" class="space-y-4">
         <div>
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@email.com" required autocomplete="email" />
+          <label for="identifier">Username or Email</label>
+          <input type="text" id="identifier" name="identifier" placeholder="your_username or you@email.com" required autocomplete="username" />
         </div>
         <div>
           <label for="password">Password</label>

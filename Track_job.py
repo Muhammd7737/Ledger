@@ -84,6 +84,13 @@ with app.app_context():
     except:
         pass
 
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(db.text('ALTER TABLE profiles ADD COLUMN email TEXT'))
+            conn.commit()
+    except:
+        pass
+
 @app.before_request
 def load_supabase_session():
     if 'access_token' in session and 'refresh_token' in session:
@@ -296,8 +303,18 @@ def validate_password(password):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        identifier = request.form['identifier'].strip()
         password = request.form['password']
+
+        if '@' in identifier:
+            email = identifier
+        else:
+            match = Profile.query.filter_by(username=identifier).first()
+            if not match or not match.email:
+                flash('Incorrect username or password.', 'error')
+                return render_template('login.html')
+            email = match.email
+
         try:
             result = supabase.auth.sign_in_with_password({"email": email, "password": password})
             session['loggedin'] = True
@@ -306,8 +323,8 @@ def login():
             session['access_token'] = result.session.access_token
             session['refresh_token'] = result.session.refresh_token
             return redirect(url_for('index'))
-        except Exception:
-            flash(str(e), 'error')
+        except Exception as e:
+            flash('Incorrect username or password.', 'error')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -329,12 +346,13 @@ def register():
             return render_template('register.html')
 
         if result.user:
-            profile = Profile(id=result.user.id, username=username)
+            profile = Profile(id=result.user.id, username=username, email=email)
             db.session.add(profile)
             db.session.commit()
 
         flash('Account created! Check your email to confirm, then log in.', 'success')
         return redirect(url_for('login'))
+
     return render_template('register.html')
 
 @app.route('/logout')
@@ -386,6 +404,11 @@ def profile():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
     profile_obj = Profile.query.get(session['id'])
+        if profile_obj:
+            profile_obj.email = new_email
+            db.session.commit()
+            
+    email = db.Column(db.String(120), unique=True, nullable=True)
     return render_template('profile.html', email=session.get('email'), profile=profile_obj)
 
 @app.route('/profile/update-email', methods=['POST'])
