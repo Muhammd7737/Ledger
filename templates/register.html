@@ -1,197 +1,136 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full bg-white">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Register · Ledger</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { margin: 0; background: #ffffff; font-family: 'Inter', system-ui, sans-serif; }
-
-    .card {
-      background: #ffffff;
-      border: 1px solid #e5e5e5;
-      border-radius: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-
-    label { font-size: 13px; font-weight: 500; color: #37352f; display: block; margin-bottom: 6px; }
-
-    input {
-      background: #fafafa;
-      border: 1px solid #e5e5e5;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 14px;
-      color: #171717;
-      outline: none;
-      width: 100%;
-      transition: border-color .15s;
-    }
-    input:focus { border-color: #171717; }
-    input::placeholder { color: #a3a3a3; }
-    input.input-error { border-color: #ef4444; }
-    input.input-ok { border-color: #10b981; }
-
-    .btn {
-      width: 100%;
-      background: #0a0a0a;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 13px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s, transform .1s;
-    }
-    .btn:hover { background: #262626; }
-    .btn:active { transform: scale(0.98); }
-
-    .btn-google {
-      width: 100%;
-      background: #ffffff;
-      color: #171717;
-      border: 1px solid #e5e5e5;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background .15s, transform .1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .btn-google:hover { background: #fafafa; }
-    .btn-google:active { transform: scale(0.98); }
-
-    .flash-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
-    .flash-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; border-radius: 10px; padding: 10px 14px; font-size: 13px; }
-
-    .divider { display: flex; align-items: center; gap: 12px; color: #d4d4d4; font-size: 12px; }
-    .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e5e5e5; }
-
-    .username-status { font-size: 12px; margin-top: 4px; min-height: 16px; }
-    .username-status.ok { color: #059669; }
-    .username-status.taken { color: #dc2626; }
-
-    .req-list { font-size: 11px; color: #a3a3a3; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 10px; }
-    .req-list span.met { color: #059669; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register · Ledger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input.input-error { border-color: #ef4444 !important; }
+        input.input-ok { border-color: #10b981 !important; }
+        .username-status.ok { color: #059669; }
+        .username-status.taken { color: #dc2626; }
+        .req-list span.met { color: #059669; }
+    </style>
 </head>
-<body class="h-full flex items-center justify-center px-4 py-12">
+<body class="h-full flex items-center justify-center text-[#37352f] px-4 py-10">
+    <div class="w-full max-w-sm">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold tracking-tight">Create Account</h1>
+            <p class="text-neutral-500 text-sm mt-2">Join Ledger to start tracking your applications.</p>
+        </div>
 
-  <div class="w-full max-w-sm">
+        <div class="relative my-4">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-neutral-200"></div>
+            </div>
+            <div class="relative flex justify-center text-xs text-neutral-400">
+                <span class="bg-white px-2">or</span>
+            </div>
+        </div>
 
-    <div class="text-center mb-6">
-      <h1 class="font-bold text-3xl tracking-tight text-[#171717] mb-2">Create Account</h1>
-      <p class="text-neutral-500 text-sm">Join Ledger to start tracking your applications.</p>
+        <a href="{{ url_for('auth_google') }}"
+            class="flex items-center justify-center gap-2 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50 transition-colors mb-6">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4">
+            Continue with Google
+        </a>
+
+        <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="text-xs p-3 rounded-xl mb-4 {% if category == 'error' %}bg-red-50 text-red-600 border-red-100{% else %}bg-green-50 text-green-600 border-green-100{% endif %} border">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('register') }}" method="post" class="space-y-4" id="registerForm">
+                <div>
+                    <label class="block text-xs font-medium text-neutral-600 mb-1">Username</label>
+                    <input type="text" name="username" id="username" placeholder="choose_username" required
+                           class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-black outline-none focus:border-black transition-all">
+                    <p class="username-status text-xs mt-1 min-h-[16px]" id="usernameStatus"></p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-neutral-600 mb-1">Email</label>
+                    <input type="email" name="email" placeholder="you@email.com" required
+                           class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-black outline-none focus:border-black transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-neutral-600 mb-1">Password</label>
+                    <input type="password" name="password" id="password" placeholder="••••••••" required
+                           class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-black outline-none focus:border-black transition-all">
+                    <div class="req-list flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-neutral-400 mt-1" id="reqList">
+                        <span data-req="length">8+ characters</span>
+                        <span data-req="upper">Uppercase</span>
+                        <span data-req="lower">Lowercase</span>
+                        <span data-req="digit">Number</span>
+                        <span data-req="special">Special character</span>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full rounded-xl bg-black text-white px-4 py-2 hover:bg-neutral-800 transition-colors font-semibold mt-2">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-neutral-500">
+                Already have an account?
+                <a href="{{ url_for('login') }}" class="text-black font-medium hover:underline">Login here</a>
+            </div>
+        </div>
     </div>
 
-    <div class="divider mb-6">or</div>
+    <script>
+        const usernameInput = document.getElementById('username');
+        const usernameStatus = document.getElementById('usernameStatus');
+        let usernameTimer = null;
 
-    <a href="{{ url_for('auth_google') }}" class="btn-google mb-6">
-      <svg width="16" height="16" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
-        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
-        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.63H1.29A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.29 5.37l3.98-3.09z"/>
-        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"/>
-      </svg>
-      Continue with Google
-    </a>
+        usernameInput.addEventListener('input', function () {
+            const value = usernameInput.value.trim();
+            clearTimeout(usernameTimer);
+            usernameInput.classList.remove('input-ok', 'input-error');
+            usernameStatus.textContent = '';
+            usernameStatus.className = 'username-status text-xs mt-1 min-h-[16px]';
+            if (!value) return;
 
-    <div class="card p-8">
+            usernameTimer = setTimeout(() => {
+                fetch('/check-username?username=' + encodeURIComponent(value))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.available) {
+                            usernameInput.classList.add('input-ok');
+                            usernameStatus.textContent = 'Username available';
+                            usernameStatus.classList.add('ok');
+                        } else {
+                            usernameInput.classList.add('input-error');
+                            usernameStatus.textContent = 'Username already taken';
+                            usernameStatus.classList.add('taken');
+                        }
+                    })
+                    .catch(() => { /* silently ignore network hiccups */ });
+            }, 350);
+        });
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="{{ 'flash-error' if category == 'error' else 'flash-success' }} mb-4">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-
-      <form method="post" action="{{ url_for('register') }}" class="space-y-4" id="registerForm">
-        <div>
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="choose_username" required autocomplete="username" />
-          <p class="username-status" id="usernameStatus"></p>
-        </div>
-
-        <div>
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@email.com" required autocomplete="email" />
-        </div>
-
-        <div>
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password" />
-          <div class="req-list" id="reqList">
-            <span data-req="length">8+ characters</span>
-            <span data-req="upper">Uppercase</span>
-            <span data-req="lower">Lowercase</span>
-            <span data-req="digit">Number</span>
-            <span data-req="special">Special character</span>
-          </div>
-        </div>
-
-        <button type="submit" class="btn" style="margin-top:4px;">Create Account</button>
-      </form>
-
-      <p class="text-center text-sm text-neutral-500 mt-5">
-        Already have an account?
-        <a href="{{ url_for('login') }}" class="font-semibold text-[#171717] no-underline">Login here</a>
-      </p>
-    </div>
-  </div>
-
-  <script>
-    const usernameInput = document.getElementById('username');
-    const usernameStatus = document.getElementById('usernameStatus');
-    let usernameTimer = null;
-
-    usernameInput.addEventListener('input', function () {
-      const value = usernameInput.value.trim();
-      clearTimeout(usernameTimer);
-      usernameInput.classList.remove('input-ok', 'input-error');
-      usernameStatus.textContent = '';
-      usernameStatus.className = 'username-status';
-      if (!value) return;
-
-      usernameTimer = setTimeout(() => {
-        fetch('/check-username?username=' + encodeURIComponent(value))
-          .then(res => res.json())
-          .then(data => {
-            if (data.available) {
-              usernameInput.classList.add('input-ok');
-              usernameStatus.textContent = 'Username available';
-              usernameStatus.classList.add('ok');
-            } else {
-              usernameInput.classList.add('input-error');
-              usernameStatus.textContent = 'Username already taken';
-              usernameStatus.classList.add('taken');
-            }
-          })
-          .catch(() => { /* silently ignore network hiccups */ });
-      }, 350);
-    });
-
-    const passwordInput = document.getElementById('password');
-    const reqSpans = document.querySelectorAll('#reqList span');
-    passwordInput.addEventListener('input', function () {
-      const val = passwordInput.value;
-      const checks = {
-        length: val.length >= 8,
-        upper: /[A-Z]/.test(val),
-        lower: /[a-z]/.test(val),
-        digit: /[0-9]/.test(val),
-        special: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val)
-      };
-      reqSpans.forEach(span => span.classList.toggle('met', checks[span.dataset.req]));
-    });
-  </script>
-
+        const passwordInput = document.getElementById('password');
+        const reqSpans = document.querySelectorAll('#reqList span');
+        passwordInput.addEventListener('input', function () {
+            const val = passwordInput.value;
+            const checks = {
+                length: val.length >= 8,
+                upper: /[A-Z]/.test(val),
+                lower: /[a-z]/.test(val),
+                digit: /[0-9]/.test(val),
+                special: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val)
+            };
+            reqSpans.forEach(span => span.classList.toggle('met', checks[span.dataset.req]));
+        });
+    </script>
 </body>
 </html>
