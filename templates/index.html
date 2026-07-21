@@ -313,6 +313,16 @@
         <a href="{{ url_for('index', q=search_query, sort='oldest') }}"
           class="sort-btn {{ 'active' if sort == 'oldest' else '' }}">Oldest</a>
       </div>
+      <a href="{{ url_for('export_csv') }}"
+        class="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 rounded-full px-3 py-1.5 hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-colors no-underline">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Export CSV
+      </a>
     </div>
 
     <!-- Kanban Board -->
