@@ -222,7 +222,7 @@
     </div>
 
     <!-- Stats bar -->
-    <div class="grid grid-cols-5 gap-3 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
       <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Total</p>
         <p class="text-2xl font-semibold">{{ total_applied }}</p>
@@ -326,7 +326,7 @@
     </div>
 
     <!-- Kanban Board -->
-    <div class="grid grid-cols-4 gap-4">
+    <div class="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible pb-3 md:pb-0">
       {% set columns = [
       ('Applied', 'applied'),
       ('Interview', 'interview'),
@@ -335,7 +335,7 @@
       ] %}
 
       {% for status, cls in columns %}
-      <div class="col-{{ cls }} rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm flex flex-col"
+      <div class="col-{{ cls }} rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm flex flex-col flex-shrink-0 w-[85vw] snap-center md:w-auto"
         style="min-height:480px;">
 
         <div class="px-4 py-3 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
