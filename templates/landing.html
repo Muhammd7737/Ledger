@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ledger — Your job search, tracked.</title>
+
+  <meta property="og:title" content="Ledger — Your job search, tracked." />
+  <meta property="og:description" content="A clean Kanban board for your job hunt. Track applications, interviews, deadlines, and offers in one place." />
+  <meta property="og:type" content="website" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html{scroll-behavior:smooth;}
+    details > summary { list-style: none; cursor:pointer; }
+    details > summary::-webkit-details-marker{ display:none; }
+    details[open] .chev{ transform: rotate(45deg); }
+    .chev{ transition: transform .2s ease; }
+    @keyframes riseIn{ from{ opacity:0; transform: translateY(18px); } to{ opacity:1; transform: translateY(0); } }
+    .rise{ animation: riseIn .7s ease-out both; }
+    @media (prefers-reduced-motion: reduce){ .rise{ animation:none; } }
+  </style>
+</head>
+<body class="h-full bg-white text-[#37352f]">
+
+<nav class="border-b border-neutral-100 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="mx-auto max-w-6xl px-4 flex justify-between items-center">
+    <div class="flex items-center gap-6">
+      <a href="#top" class="font-bold text-lg tracking-tight">Ledger</a>
+      <div class="hidden md:flex gap-4">
+        <a href="#features" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">Features</a>
+        <a href="#story" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">Why Ledger</a>
+        <a href="#faq" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">FAQ</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('login') }}" class="text-sm font-medium text-neutral-600 hover:text-black transition-colors">Log in</a>
+      <a href="{{ url_for('register') }}" class="text-xs font-semibold bg-black text-white px-4 py-2 rounded-lg hover:bg-neutral-800 transition-colors">
+        Get started
+      </a>
+    </div>
+  </div>
+</nav>
+
+<header id="top" class="mx-auto max-w-6xl px-4 pt-16 md:pt-20 pb-10">
+  <div class="grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-500 mb-4">Built for the job hunt</p>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight mb-4 leading-tight">
+        Your job search,<br/>actually organized.
+      </h1>
+      <p class="text-neutral-500 text-lg mb-8 max-w-md">
+        No more digging through email threads to remember if you already applied. Every company gets a card. Every card lives on a board. Drag it forward as things move.
+      </p>
+      <div class="flex flex-wrap items-center gap-3 mb-3">
+        <a href="{{ url_for('register') }}" class="rounded-xl bg-black text-white px-6 py-3 hover:bg-neutral-800 transition-colors shadow-sm font-semibold">
+          Start tracking free
+        </a>
+        <a href="{{ url_for('login') }}" class="rounded-xl bg-white hover:bg-neutral-50 px-6 py-3 border border-neutral-200 transition-colors font-medium">
+          Log in
+        </a>
+      </div>
+      <p class="text-xs text-neutral-400">Free · no card required</p>
+    </div>
+
+    <div class="rounded-2xl border border-neutral-200 bg-white shadow-[0_30px_60px_-30px_rgba(0,0,0,0.18)] overflow-hidden rise">
+      <div class="bg-neutral-50 border-b border-neutral-100 px-4 py-3 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-neutral-300"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-neutral-300"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-neutral-300"></span>
+        <span class="text-xs text-neutral-400 ml-2">ledger.app/dashboard</span>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-4 gap-2 mb-3">
+          <div class="rounded-xl border border-neutral-200 bg-white" style="min-height:170px;">
+            <div class="px-2.5 py-2 border-b border-neutral-100 flex items-center justify-between">
+              <span class="text-[11px] font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span>Applied</span>
+              <span class="text-[9px] text-neutral-400 bg-neutral-50 border border-neutral-200 rounded-full px-1.5">6</span>
+            </div>
+            <div class="p-1.5 space-y-1.5">
+              <div class="rounded-lg border border-neutral-200 bg-white p-1.5">
+                <p class="font-semibold text-[10px]">Wayfair</p>
+                <p class="text-[9px] text-neutral-500">Data Analyst Intern</p>
+              </div>
+              <div class="rounded-lg border border-neutral-200 bg-white p-1.5">
+                <p class="font-semibold text-[10px]">Shopify</p>
+                <p class="text-[9px] text-neutral-500">SWE Intern</p>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-xl border border-neutral-200 bg-white" style="min-height:170px;">
+            <div class="px-2.5 py-2 border-b border-neutral-100 flex items-center justify-between">
+              <span class="text-[11px] font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>Interview</span>
+              <span class="text-[9px] text-neutral-400 bg-neutral-50 border border-neutral-200 rounded-full px-1.5">3</span>
+            </div>
+            <div class="p-1.5 space-y-1.5">
+              <div class="rounded-lg border border-neutral-200 bg-white p-1.5">
+                <p class="font-semibold text-[10px]">Capital One</p>
+                <p class="text-[9px] text-neutral-500 mb-1">Software Engineer</p>
+                <span class="inline-block text-[8px] bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-1.5 py-0.5">Aug 2</span>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-xl border border-neutral-200 bg-white" style="min-height:170px;">
+            <div class="px-2.5 py-2 border-b border-neutral-100 flex items-center justify-between">
+              <span class="text-[11px] font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>Offer</span>
+              <span class="text-[9px] text-neutral-400 bg-neutral-50 border border-neutral-200 rounded-full px-1.5">1</span>
+            </div>
+            <div class="p-1.5 space-y-1.5">
+              <div class="rounded-lg border border-neutral-200 bg-white p-1.5">
+                <p class="font-semibold text-[10px]">Cisco</p>
+                <p class="text-[9px] text-neutral-500 mb-1">Systems Engineer</p>
+                <span class="inline-block text-[8px] bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full px-1.5 py-0.5">$92k</span>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-xl border border-neutral-200 bg-white" style="min-height:170px;">
+            <div class="px-2.5 py-2 border-b border-neutral-100 flex items-center justify-between">
+              <span class="text-[11px] font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>Rejected</span>
+              <span class="text-[9px] text-neutral-400 bg-neutral-50 border border-neutral-200 rounded-full px-1.5">2</span>
+            </div>
+            <div class="p-1.5 space-y-1.5">
+              <div class="rounded-lg border border-neutral-200 bg-white p-1.5">
+                <p class="font-semibold text-[10px]">Palantir</p>
+                <p class="text-[9px] text-neutral-500">Forward Deployed Eng.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-center">
+            <p class="text-base font-semibold">12</p>
+            <p class="text-[9px] text-neutral-400">total</p>
+          </div>
+          <div class="rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-center">
+            <p class="text-base font-semibold text-blue-500">33%</p>
+            <p class="text-[9px] text-neutral-400">interview</p>
+          </div>
+          <div class="rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-center">
+            <p class="text-base font-semibold text-emerald-500">8%</p>
+            <p class="text-[9px] text-neutral-400">offer</p>
+          </div>
+          <div class="rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-center">
+            <p class="text-base font-semibold text-red-500">17%</p>
+            <p class="text-[9px] text-neutral-400">rejected</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features" class="mx-auto max-w-6xl px-4 py-20">
+  <p class="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-400 mb-3">Everything included</p>
+  <h2 class="text-3xl font-semibold tracking-tight mb-12 max-w-lg">Everything a job search should keep track of.</h2>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Kanban board</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Applied, Interview, Offer, Rejected — drag a card between columns and the stage updates instantly.</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Interview &amp; deadline tracking</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Set an interview date or an apply-by deadline — badges turn urgent automatically as the date gets close.</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Salary &amp; notes</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Keep compensation details and free-form notes right on the card, alongside a link back to the original posting.</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Stats that update themselves</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Response rate, interview rate, offer rate, and rejection rate — recalculated the moment anything changes.</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Archive, don't delete</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Closed out an application? Archive it instead of losing the history — restore it anytime from a dedicated view.</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h3 class="font-semibold mb-2">Export anywhere</h3>
+      <p class="text-neutral-500 text-sm leading-relaxed">Pull your full application history as a CSV whenever you want it, no lock-in.</p>
+    </div>
+  </div>
+</section>
+
+<section id="story" class="border-y border-neutral-100 bg-neutral-50">
+  <div class="mx-auto max-w-3xl px-4 py-20">
+    <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-500 mb-3">Why Ledger</p>
+    <h2 class="text-3xl font-semibold tracking-tight mb-6">I kept losing track, so I built the tracker.</h2>
+    <p class="text-neutral-600 leading-relaxed mb-4">
+      Somewhere around application thirty, the spreadsheet stopped working. Half the rows were out of date, I couldn't remember which recruiter I'd already followed up with, and a deadline slipped past me because it was buried in an email I'd archived.
+    </p>
+    <p class="text-neutral-600 leading-relaxed">
+      Ledger is the tool I actually wanted: a board where a company's status is always current, deadlines can't hide, and checking "how's the search going" takes one glance instead of a scroll through old emails.
+    </p>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-16">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div>
+      <p class="text-2xl font-semibold">4</p>
+      <p class="text-xs uppercase tracking-wide text-neutral-400">stages tracked</p>
+    </div>
+    <div>
+      <p class="text-2xl font-semibold">1 drag</p>
+      <p class="text-xs uppercase tracking-wide text-neutral-400">to update a stage</p>
+    </div>
+    <div>
+      <p class="text-2xl font-semibold">CSV</p>
+      <p class="text-xs uppercase tracking-wide text-neutral-400">export anytime</p>
+    </div>
+    <div>
+      <p class="text-2xl font-semibold">$0</p>
+      <p class="text-xs uppercase tracking-wide text-neutral-400">to get started</p>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="border-t border-neutral-100 bg-neutral-50">
+  <div class="mx-auto max-w-3xl px-4 py-20">
+    <p class="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-400 mb-3">Questions</p>
+    <h2 class="text-3xl font-semibold tracking-tight mb-10">Before you open an account.</h2>
+
+    <div class="space-y-3">
+      <details class="group rounded-2xl border border-neutral-200 bg-white px-5" open>
+        <summary class="flex justify-between items-center font-medium py-4">
+          Is Ledger free to use?
+          <span class="chev text-xl text-neutral-400">+</span>
+        </summary>
+        <p class="text-neutral-500 text-sm pb-4 leading-relaxed">Yes. Creating an account, tracking applications, and exporting your data all cost nothing.</p>
+      </details>
+
+      <details class="group rounded-2xl border border-neutral-200 bg-white px-5">
+        <summary class="flex justify-between items-center font-medium py-4">
+          Can I sign in with Google?
+          <span class="chev text-xl text-neutral-400">+</span>
+        </summary>
+        <p class="text-neutral-500 text-sm pb-4 leading-relaxed">Yes, or register with a username, email, and password. Either way, your password is never stored in plain text.</p>
+      </details>
+
+      <details class="group rounded-2xl border border-neutral-200 bg-white px-5">
+        <summary class="flex justify-between items-center font-medium py-4">
+          Can I get my data out if I stop using it?
+          <span class="chev text-xl text-neutral-400">+</span>
+        </summary>
+        <p class="text-neutral-500 text-sm pb-4 leading-relaxed">Anytime. Export your full application history as a CSV directly from your dashboard.</p>
+      </details>
+
+      <details class="group rounded-2xl border border-neutral-200 bg-white px-5">
+        <summary class="flex justify-between items-center font-medium py-4">
+          Does it work on my phone?
+          <span class="chev text-xl text-neutral-400">+</span>
+        </summary>
+        <p class="text-neutral-500 text-sm pb-4 leading-relaxed">Yes — the board switches to a swipeable, single-column view on smaller screens so you can check on applications from anywhere.</p>
+      </details>
+
+      <details class="group rounded-2xl border border-neutral-200 bg-white px-5">
+        <summary class="flex justify-between items-center font-medium py-4">
+          Can I delete my account later?
+          <span class="chev text-xl text-neutral-400">+</span>
+        </summary>
+        <p class="text-neutral-500 text-sm pb-4 leading-relaxed">Yes, permanently, from your profile page — it removes your applications and account in one step.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-24 text-center">
+  <h2 class="text-4xl font-semibold tracking-tight mb-4 max-w-xl mx-auto leading-tight">Open your board. It takes a minute.</h2>
+  <a href="{{ url_for('register') }}" class="inline-flex items-center gap-2 rounded-xl bg-black text-white px-8 py-4 hover:bg-neutral-800 transition-colors shadow-sm font-semibold">
+    Create your account
+  </a>
+</section>
+
+<footer class="border-t border-neutral-100">
+  <div class="mx-auto max-w-6xl px-4 py-10 flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="font-bold text-lg">Ledger</p>
+    <p class="text-xs text-neutral-400">© 2026 Ledger. Track it, don't lose it.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+# Ledger
+
+A personal job application tracker with a Kanban-style board, built with Flask and Supabase. Track applications from "Applied" through "Interview," "Offer," or "Rejected," with drag-and-drop status updates, interview dates, deadlines, salary notes, and full user authentication.
+
+## Features
+
+**Core tracking**
+- Kanban board with four stages: Applied, Interview, Offer, Rejected
+- Drag-and-drop to update an application's stage
+- Add, edit, archive/restore, and delete applications
+- Search by company or role, sort by newest/oldest
+
+**Application details**
+- Interview date badge
+- Apply-by deadline badge (turns urgent within 3 days of the deadline)
+- Salary field
+- Time-in-stage indicator (days since the last status change)
+- Notes and job posting URL, with the card becoming clickable when a URL is set
+
+**Stats bar**
+- Total applications, response rate, interview rate, offer rate, rejection rate
+
+**Authentication**
+- Email/password sign-up and login via Supabase Auth
+- Google OAuth sign-in
+- Log in with either your username or your email
+- Profile page: update email, update password, upload a profile picture, delete account
+
+**Other**
+- Dark mode with a persistent toggle
+- Mobile-responsive board (horizontal swipeable columns on small screens)
+- CSV export of all applications
+
+## Tech stack
+
+- **Backend:** Flask, Flask-SQLAlchemy
+- **Database:** Supabase (hosted Postgres)
+- **Auth:** Supabase Auth (email/password + Google OAuth)
+- **Frontend:** Jinja2 templates, Tailwind CSS (via CDN)
+- **Hosting:** Render
+
+## Project structure
+
+```
+├── Track_job.py          # Main Flask application
+├── templates/
+│   ├── index.html        # Dashboard / Kanban board
+│   ├── archived.html     # Archived applications
+│   ├── login.html
+│   ├── register.html
+│   └── profile.html
+├── requirements.txt
+└── .env                   # Not committed — see setup below
+```
+
+## Setup
+
+### 1. Clone and install dependencies
+
+```bash
+git clone <your-repo-url>
+cd ledger
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. Create a Supabase project
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. **Settings → API** (or the **Data API** tab) — copy your **Project URL** and **Publishable/anon key**
+3. **Settings → API Keys** — copy your **secret/service_role key** (needed for account deletion)
+4. From the project's **Connect** button — copy the **Session pooler** connection string (port `5432`) for your database URL
+5. **Authentication → Sign In / Providers → Email** — enable the Email provider; turn off "Confirm email" if you don't want new users to verify their address before logging in
+6. **Authentication → Sign In / Providers → Google** — enable Google sign-in (requires a Google Cloud OAuth client — see below)
+
+### 3. Set up Google OAuth (optional, for "Continue with Google")
+
+1. In [Google Cloud Console](https://console.cloud.google.com), create an OAuth 2.0 Client ID (Web application)
+2. Add this as an authorized redirect URI: `https://<your-project-ref>.supabase.co/auth/v1/callback`
+3. Copy the Client ID and Secret into Supabase's Google provider settings
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-secret-key
+DATABASE_URL=postgresql://postgres.xxxxx:yourpassword@aws-x-xx-xxxx.pooler.supabase.com:5432/postgres
+SECRET_KEY=generate-with-python-secrets
+```
+
+Generate a `SECRET_KEY` with:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+### 5. Run locally
+
+```bash
+python Track_job.py
+```
+
+The app runs at `http://localhost:8080`.
+
+## Deployment (Render)
+
+1. Push the repo to GitHub
+2. Create a new Web Service on [Render](https://render.com), connected to the repo
+3. Set the **Start Command** to:
+   ```
+   gunicorn Track_job:app
+   ```
+4. Add all five environment variables from your `.env` file under Render's **Environment** tab
+5. Deploy
+
+## License
+
+Personal project — feel free to fork and adapt for your own use.
