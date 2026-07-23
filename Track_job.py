@@ -106,7 +106,7 @@ def load_supabase_session():
 @app.route('/')
 def index():
     if 'loggedin' not in session:
-        return redirect(url_for('landing.html'))
+        return render_template('landing.html')
     
     edit_id = request.args.get('edit_id', type=int)
 
