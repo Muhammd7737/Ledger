@@ -267,7 +267,7 @@ def archived():
 
     jobs = Job.query.filter_by(archived=True).order_by(Job.id.desc()).all()
     profile = Profile.query.get(session['id'])
-    return render_template('archived.html', jobs=jobs)
+    return render_template('archived.html', jobs=jobs, profile=profile)
 
 # ----------Job deadline----------
 @app.template_filter('days_since')
