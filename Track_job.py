@@ -160,7 +160,7 @@ def index():
         interview_rate=interview_rate,
         offer_rate=offer_rate,
         rejected_rate=rejected_rate,
-        
+        profile=profile
     )
 
 
