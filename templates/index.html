@@ -32,8 +32,12 @@
         <span class="text-sm text-neutral-500">Hi, {{ profile.username if profile else 'there' }}</span>
         <div class="relative">
           <button id="profile-btn" onclick="document.getElementById('profile-menu').classList.toggle('hidden')"
-            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold hover:bg-neutral-800 transition-colors focus:outline-none">
+            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold hover:bg-neutral-800 transition-colors focus:outline-none overflow-hidden">
+            {% if profile and profile.profile_pic %}
+            <img src="{{ profile.profile_pic }}" alt="Profile" class="w-full h-full object-cover" />
+            {% else %}
             {{ (profile.username[0].upper() if profile and profile.username else '?') }}
+            {% endif %}
           </button>
           <div id="profile-menu" class="hidden absolute right-0 mt-2 w-44 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 py-1">
             <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors">Edit Profile</a>
