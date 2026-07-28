@@ -18,26 +18,9 @@
     .dot-rejected  { background: #ef4444; }
     .sort-btn { font-size:12px; padding:4px 12px; border-radius:20px; text-decoration:none; font-weight:500; color:#737373; background:white; border:1px solid #e5e5e5; transition:all .15s; }
     .sort-btn.active { background:black; color:white; border-color:black; }
-
-    /* Dark mode */
-    .dark body { background:#0f1117; color:#e2e8f4; }
-    .dark .bg-white { background:#0f1117 !important; }
-    .dark .bg-neutral-50 { background:#161b27 !important; }
-    .dark .border-neutral-100 { border-color:#252f42 !important; }
-    .dark .border-neutral-200 { border-color:#252f42 !important; }
-    .dark .text-neutral-400 { color:#7a8ba8 !important; }
-    .dark .text-neutral-500 { color:#94a3b8 !important; }
-    .dark .text-\[#37352f\] { color:#e2e8f4 !important; }
-    .dark .rounded-2xl { background:#161b27; }
-    .dark .shadow-sm { box-shadow: none; }
-    .dark input, .dark select, .dark textarea { background:#0a0f1d !important; color:#e2e8f4 !important; border-color:#252f42 !important; }
-    .dark input::placeholder { color:#475569 !important; }
-    .dark .sort-btn { background:#161b27; color:#94a3b8; border-color:#252f42; }
-    .dark .sort-btn.active { background:white; color:black; border-color:white; }
-    .dark .card-drag-over { background:#1b2642; outline-color:#3b82f6; }
   </style>
 </head>
-<body class="h-full bg-white text-[#37352f]" id="body">
+<body class="h-full bg-white text-[#37352f]">
 
   <nav class="border-b border-neutral-100 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
     <div class="mx-auto max-w-7xl px-4 flex justify-between items-center">
@@ -45,14 +28,19 @@
         <a href="{{ url_for('index') }}" class="font-bold text-lg tracking-tight">JobTrail</a>
         <a href="{{ url_for('archived') }}" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">Archived</a>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-xs text-neutral-400 font-mono" id="clock">--:--:--</span>
-        <button onclick="toggleDark()" id="dark-btn"
-          class="text-xs border border-neutral-200 rounded-lg px-3 py-1.5 hover:bg-neutral-50 transition-colors text-neutral-500">
-          Dark
-        </button>
+      <div class="flex items-center gap-3">
         <span class="text-sm text-neutral-500">Hi, {{ session.username }}</span>
-        <a href="{{ url_for('logout') }}" class="text-xs border border-neutral-200 rounded-lg px-3 py-1.5 hover:bg-neutral-50 transition-colors text-neutral-500">Logout</a>
+        <div class="relative">
+          <button id="profile-btn" onclick="document.getElementById('profile-menu').classList.toggle('hidden')"
+            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold hover:bg-neutral-800 transition-colors focus:outline-none">
+            {{ session['username'][0].upper() }}
+          </button>
+          <div id="profile-menu" class="hidden absolute right-0 mt-2 w-44 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 py-1">
+            <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors">Edit Profile</a>
+            <div class="border-t border-neutral-100 my-1"></div>
+            <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">Logout</a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -235,28 +223,17 @@
   </main>
 
   <script>
-    // Clock
-    function updateClock() {
-      document.getElementById('clock').textContent = new Date().toTimeString().split(' ')[0];
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    // Profile dropdown close on outside click
+    document.addEventListener('click', function(e) {
+      const btn = document.getElementById('profile-btn');
+      const menu = document.getElementById('profile-menu');
+      if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
 
-    // Dark mode
-    function toggleDark() {
-      const html = document.documentElement;
-      html.classList.toggle('dark');
-      localStorage.setItem('dark', html.classList.contains('dark') ? '1' : '0');
-      document.getElementById('dark-btn').textContent = html.classList.contains('dark') ? 'Light' : 'Dark';
-    }
-    if (localStorage.getItem('dark') === '1') {
-      document.documentElement.classList.add('dark');
-      document.getElementById('dark-btn').textContent = 'Light';
-    }
-
-    // Drag and drop — fixed so links and buttons still work
+    // Drag and drop
     let draggedId = null;
-
     document.addEventListener('dragstart', function(e) {
       if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form')) {
         e.preventDefault();
@@ -267,13 +244,11 @@
       draggedId = card.dataset.id;
       setTimeout(() => card.style.opacity = '0.35', 0);
     });
-
     document.addEventListener('dragend', function(e) {
       const card = e.target.closest('[data-id]');
       if (card) card.style.opacity = '1';
       draggedId = null;
     });
-
     function handleDrop(e, newStatus) {
       e.preventDefault();
       e.currentTarget.classList.remove('card-drag-over');
