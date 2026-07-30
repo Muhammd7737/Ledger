@@ -1,12 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-white">
+<html lang="en" class="h-full">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard · Ledger</title>
+  <script>
+    // Apply stored theme before Tailwind/paint to avoid a light-mode flash
+    (function () {
+      try {
+        const stored = localStorage.getItem('ledger-theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = stored ? stored === 'dark' : prefersDark;
+        if (isDark) document.documentElement.classList.add('dark');
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
   <style>
     .card-drag-over { outline: 2px dashed #a3a3a3; outline-offset: -2px; background: #f9fafb; }
+    .dark .card-drag-over { background: #262626; outline-color: #525252; }
     .dragging { opacity: 0.35; }
     .col-applied   { border-top: 2px solid #94a3b8; }
     .col-interview { border-top: 2px solid #3b82f6; }
@@ -18,31 +33,39 @@
     .dot-rejected  { background: #ef4444; }
     .sort-btn { font-size:12px; padding:4px 12px; border-radius:20px; text-decoration:none; font-weight:500; color:#737373; background:white; border:1px solid #e5e5e5; transition:all .15s; }
     .sort-btn.active { background:black; color:white; border-color:black; }
+    .dark .sort-btn { background:#171717; border-color:#333333; color:#a3a3a3; }
+    .dark .sort-btn.active { background:white; color:black; border-color:white; }
   </style>
 </head>
-<body class="h-full bg-white text-[#37352f]">
+<body class="h-full bg-white text-[#37352f] dark:bg-neutral-900 dark:text-neutral-100 transition-colors">
 
-  <nav class="border-b border-neutral-100 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+  <nav class="border-b border-neutral-100 dark:border-neutral-800 py-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-50">
     <div class="mx-auto max-w-7xl px-4 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <a href="{{ url_for('index') }}" class="font-bold text-lg tracking-tight">Ledger</a>
-        <a href="{{ url_for('archived') }}" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">Archived</a>
+        <a href="{{ url_for('archived') }}" class="text-sm font-medium text-neutral-400 hover:text-black dark:hover:text-white transition-colors">Archived</a>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4">
+        <label class="relative inline-flex items-center cursor-pointer" title="Toggle dark mode">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" class="sr-only peer">
+          <div class="w-11 h-6 bg-neutral-300 dark:bg-neutral-700 rounded-full peer-checked:bg-black dark:peer-checked:bg-white transition-colors"></div>
+          <div class="absolute left-[3px] top-[3px] w-[18px] h-[18px] bg-white dark:bg-neutral-900 rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+        </label>
+
         <span class="text-sm text-neutral-500">Hi, {{ profile.username if profile else 'there' }}</span>
         <div class="relative">
           <button id="profile-btn" onclick="document.getElementById('profile-menu').classList.toggle('hidden')"
-            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold hover:bg-neutral-800 transition-colors focus:outline-none overflow-hidden">
+            class="w-8 h-8 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center text-sm font-bold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors focus:outline-none overflow-hidden">
             {% if profile and profile.profile_pic %}
             <img src="{{ profile.profile_pic }}" alt="Profile" class="w-full h-full object-cover" />
             {% else %}
             {{ (profile.username[0].upper() if profile and profile.username else '?') }}
             {% endif %}
           </button>
-          <div id="profile-menu" class="hidden absolute right-0 mt-2 w-44 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 py-1">
-            <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors">Edit Profile</a>
-            <div class="border-t border-neutral-100 my-1"></div>
-            <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">Logout</a>
+          <div id="profile-menu" class="hidden absolute right-0 mt-2 w-44 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-lg z-50 py-1">
+            <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">Edit Profile</a>
+            <div class="border-t border-neutral-100 dark:border-neutral-700 my-1"></div>
+            <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-neutral-700 transition-colors">Logout</a>
           </div>
         </div>
       </div>
@@ -60,27 +83,27 @@
 
     <!-- Stats bar -->
     <div class="grid grid-cols-5 gap-3 mb-6">
-      <div class="rounded-2xl bg-neutral-50 border border-neutral-200 px-5 py-4">
+      <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Total</p>
         <p class="text-2xl font-semibold">{{ total_applied }}</p>
         <p class="text-xs text-neutral-400 mt-1">applications</p>
       </div>
-      <div class="rounded-2xl bg-neutral-50 border border-neutral-200 px-5 py-4">
+      <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Response</p>
         <p class="text-2xl font-semibold text-amber-500">{{ response_rate | round | int }}%</p>
         <p class="text-xs text-neutral-400 mt-1">heard back</p>
       </div>
-      <div class="rounded-2xl bg-neutral-50 border border-neutral-200 px-5 py-4">
+      <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Interview</p>
         <p class="text-2xl font-semibold text-blue-500">{{ interview_rate | round | int }}%</p>
         <p class="text-xs text-neutral-400 mt-1">got interviews</p>
       </div>
-      <div class="rounded-2xl bg-neutral-50 border border-neutral-200 px-5 py-4">
+      <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Offer rate</p>
         <p class="text-2xl font-semibold text-emerald-500">{{ offer_rate | round | int }}%</p>
         <p class="text-xs text-neutral-400 mt-1">received offers</p>
       </div>
-      <div class="rounded-2xl bg-neutral-50 border border-neutral-200 px-5 py-4">
+      <div class="rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-5 py-4">
         <p class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Rejected</p>
         <p class="text-2xl font-semibold text-red-500">{{ rejected_rate | round | int }}%</p>
         <p class="text-xs text-neutral-400 mt-1">rejection rate</p>
@@ -88,20 +111,20 @@
     </div>
 
     <!-- Add form -->
-    <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm mb-4">
+    <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 shadow-sm mb-4">
       <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-3">Add Application</p>
       <form method="post" action="{{ url_for('add_job') }}" class="grid gap-3 items-end" style="grid-template-columns:1fr 1fr 140px 1fr 1fr auto;">
-        <input name="company" placeholder="Company" required class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-sm text-black outline-none focus:border-black" />
-        <input name="role" placeholder="Role / title" required class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-sm text-black outline-none focus:border-black" />
-        <select name="status" class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-sm text-black outline-none focus:border-black">
+        <input name="company" placeholder="Company" required class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+        <input name="role" placeholder="Role / title" required class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+        <select name="status" class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white">
           <option value="Applied">Applied</option>
           <option value="Interview">Interview</option>
           <option value="Offer">Offer</option>
           <option value="Rejected">Rejected</option>
         </select>
-        <input name="url" type="url" placeholder="Job URL (optional)" class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-sm text-black outline-none focus:border-black" />
-        <input name="notes" placeholder="Notes (optional)" class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-sm text-black outline-none focus:border-black" />
-        <button type="submit" class="rounded-xl bg-black text-white px-4 py-2 text-sm font-semibold hover:bg-neutral-800 transition-colors whitespace-nowrap">Add</button>
+        <input name="url" type="url" placeholder="Job URL (optional)" class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+        <input name="notes" placeholder="Notes (optional)" class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+        <button type="submit" class="rounded-xl bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-sm font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors whitespace-nowrap">Add</button>
       </form>
     </div>
 
@@ -110,7 +133,7 @@
       <form method="get" action="{{ url_for('index') }}" class="relative flex-none w-80">
         <input type="text" name="q" value="{{ search_query }}" placeholder="Search company or role..."
                autocomplete="off"
-               class="w-full rounded-xl bg-neutral-50 border border-neutral-200 pl-9 pr-8 py-2 text-sm text-black outline-none focus:border-black"
+               class="w-full rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 pl-9 pr-8 py-2 text-sm text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white"
                oninput="clearTimeout(window.__t); window.__t = setTimeout(() => this.form.submit(), 380);" />
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2.2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -140,14 +163,14 @@
       ] %}
 
       {% for status, cls in columns %}
-      <div class="col-{{ cls }} rounded-2xl border border-neutral-200 bg-white shadow-sm flex flex-col" style="min-height:480px;">
+      <div class="col-{{ cls }} rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm flex flex-col" style="min-height:480px;">
 
-        <div class="px-4 py-3 border-b border-neutral-100 flex items-center justify-between">
+        <div class="px-4 py-3 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="dot-{{ cls }} w-2 h-2 rounded-full inline-block flex-shrink-0"></span>
             <span class="text-sm font-semibold">{{ status }}</span>
           </div>
-          <span class="text-xs text-neutral-400 bg-neutral-50 border border-neutral-200 rounded-full px-2 py-0.5 font-mono">
+          <span class="text-xs text-neutral-400 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-full px-2 py-0.5 font-mono">
             {{ jobs_by_status[status] | length if jobs_by_status[status] else 0 }}
           </span>
         </div>
@@ -162,32 +185,32 @@
           {% for job in jobs_by_status[status] %}
 
           {% if edit_id == job.id %}
-          <div class="rounded-xl border border-black bg-neutral-50 p-3">
+          <div class="rounded-xl border border-black dark:border-white bg-neutral-50 dark:bg-neutral-900 p-3">
             <form method="post" action="{{ url_for('edit_job', job_id=job.id) }}" class="flex flex-col gap-2">
-              <input name="company" value="{{ job.company }}" required class="rounded-lg bg-white border border-neutral-200 px-2 py-1.5 text-xs text-black outline-none focus:border-black" />
-              <input name="role" value="{{ job.role }}" required class="rounded-lg bg-white border border-neutral-200 px-2 py-1.5 text-xs text-black outline-none focus:border-black" />
-              <select name="status" class="rounded-lg bg-white border border-neutral-200 px-2 py-1.5 text-xs text-black outline-none focus:border-black">
+              <input name="company" value="{{ job.company }}" required class="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1.5 text-xs text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+              <input name="role" value="{{ job.role }}" required class="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1.5 text-xs text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+              <select name="status" class="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1.5 text-xs text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white">
                 {% for s in ['Applied','Interview','Offer','Rejected'] %}
                 <option value="{{ s }}" {% if s == job.status %}selected{% endif %}>{{ s }}</option>
                 {% endfor %}
               </select>
-              <input name="url" value="{{ job.url or '' }}" placeholder="Job URL" class="rounded-lg bg-white border border-neutral-200 px-2 py-1.5 text-xs text-black outline-none focus:border-black" />
-              <input name="notes" value="{{ job.notes or '' }}" placeholder="Notes" class="rounded-lg bg-white border border-neutral-200 px-2 py-1.5 text-xs text-black outline-none focus:border-black" />
+              <input name="url" value="{{ job.url or '' }}" placeholder="Job URL" class="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1.5 text-xs text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
+              <input name="notes" value="{{ job.notes or '' }}" placeholder="Notes" class="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1.5 text-xs text-black dark:text-neutral-100 outline-none focus:border-black dark:focus:border-white" />
               <div class="flex gap-2 mt-1">
-                <button type="submit" class="flex-1 bg-black text-white rounded-lg py-1.5 text-xs font-semibold hover:bg-neutral-800 transition-colors">Save</button>
-                <a href="{{ url_for('index', q=search_query) }}" class="flex-1 bg-white border border-neutral-200 text-neutral-500 rounded-lg py-1.5 text-xs font-medium text-center hover:bg-neutral-50 transition-colors">Cancel</a>
+                <button type="submit" class="flex-1 bg-black dark:bg-white text-white dark:text-black rounded-lg py-1.5 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">Save</button>
+                <a href="{{ url_for('index', q=search_query) }}" class="flex-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-300 rounded-lg py-1.5 text-xs font-medium text-center hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">Cancel</a>
               </div>
             </form>
           </div>
 
           {% else %}
           <div draggable="true" data-id="{{ job.id }}"
-               class="rounded-xl border border-neutral-200 bg-white p-3 cursor-grab hover:shadow-md transition-shadow">
+               class="rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-3 cursor-grab hover:shadow-md transition-shadow">
 
             <div class="mb-2">
               {% if job.url %}
               <a href="{{ job.url }}" target="_blank" rel="noopener noreferrer"
-                 class="font-semibold text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 transition-colors block mb-0.5"
+                 class="font-semibold text-sm text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:text-blue-700 dark:hover:text-blue-300 transition-colors block mb-0.5"
                  onclick="event.stopPropagation()">{{ job.company }} ↗</a>
               {% else %}
               <p class="font-semibold text-sm mb-0.5">{{ job.company }}</p>
@@ -196,16 +219,16 @@
             </div>
 
             {% if job.notes %}
-            <p class="text-xs text-neutral-400 mb-2 border-l-2 border-neutral-200 pl-2 leading-relaxed">{{ job.notes }}</p>
+            <p class="text-xs text-neutral-400 mb-2 border-l-2 border-neutral-200 dark:border-neutral-700 pl-2 leading-relaxed">{{ job.notes }}</p>
             {% endif %}
 
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100">
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-700">
               <span class="text-[10px] text-neutral-400 font-mono whitespace-nowrap">{{ job.date_applied }}</span>
               <div class="flex gap-1" onclick="event.stopPropagation()">
                 <a href="{{ url_for('index', edit_id=job.id, q=search_query) }}"
-                   class="text-[11px] text-neutral-400 px-2 py-0.5 border border-neutral-200 rounded hover:text-black hover:border-black transition-colors no-underline">Edit</a>
+                   class="text-[11px] text-neutral-400 px-2 py-0.5 border border-neutral-200 dark:border-neutral-700 rounded hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-colors no-underline">Edit</a>
                 <form method="post" action="{{ url_for('archive_job', job_id=job.id) }}" style="margin:0;">
-                  <button class="text-[11px] text-neutral-400 px-2 py-0.5 border border-neutral-200 rounded hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer bg-white">Archive</button>
+                  <button class="text-[11px] text-neutral-400 px-2 py-0.5 border border-neutral-200 dark:border-neutral-700 rounded hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer bg-white dark:bg-neutral-900">Archive</button>
                 </form>
               </div>
             </div>
@@ -214,7 +237,7 @@
 
           {% endfor %}
           {% else %}
-          <p class="text-xs text-neutral-300 text-center py-8">
+          <p class="text-xs text-neutral-300 dark:text-neutral-600 text-center py-8">
             {% if search_query %}No matches{% else %}No applications{% endif %}
           </p>
           {% endif %}
@@ -235,6 +258,16 @@
         menu.classList.add('hidden');
       }
     });
+
+    // Dark mode
+    function toggleDarkMode() {
+      const checkbox = document.getElementById('darkModeToggle');
+      const isDark = checkbox.checked;
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('ledger-theme', isDark ? 'dark' : 'light');
+    }
+    // Sync the switch position with whatever theme was already applied (from the head script)
+    document.getElementById('darkModeToggle').checked = document.documentElement.classList.contains('dark');
 
     // Drag and drop
     let draggedId = null;
