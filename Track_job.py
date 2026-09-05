@@ -547,7 +547,7 @@ def export_csv():
 
 
 # ----------Privacy Policy----------
-@app.route('/privacy-policy')
+@app.route('/privacy_policy')
 def privacy_policy():
     return render_template('privacy_policy.html')
 
