@@ -545,6 +545,12 @@ def export_csv():
     response.headers['Content-Disposition'] = 'attachment; filename=ledger_export.csv'
     return response
 
+
+# ----------Privacy Policy----------
+@app.route('/privacy-policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

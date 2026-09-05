@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy · Ledger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full bg-white text-[#37352f]">
+
+<nav class="border-b border-neutral-100 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="mx-auto max-w-3xl px-4 flex justify-between items-center">
+    <a href="{{ url_for('index') }}" class="font-bold text-lg tracking-tight">Ledger</a>
+    <a href="{{ url_for('index') }}" class="text-sm font-medium text-neutral-400 hover:text-black transition-colors">&larr; Back home</a>
+  </div>
+</nav>
+
+<main class="mx-auto max-w-3xl px-4 py-16">
+  <p class="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-400 mb-3">Legal</p>
+  <h1 class="text-4xl font-semibold tracking-tight mb-3">Privacy Policy</h1>
+  <p class="text-sm text-neutral-400 mb-12">Last updated September 5, 2026</p>
+
+  <div class="space-y-10 text-neutral-600 leading-relaxed text-[15px]">
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">1. What we collect</h2>
+      <p class="mb-3">To run your account and your board, Ledger stores:</p>
+      <ul class="list-disc pl-5 space-y-1.5">
+        <li><strong class="text-[#37352f]">Account info</strong> — your email address, username, and (if you sign in with a password) a securely hashed password. We never store passwords in plain text.</li>
+        <li><strong class="text-[#37352f]">Google account info</strong> — if you sign in with Google, we receive your email address and basic profile info from Google to create and log you into your account.</li>
+        <li><strong class="text-[#37352f]">Application data</strong> — the companies, roles, statuses, dates, notes, salaries, and links you enter into your board.</li>
+        <li><strong class="text-[#37352f]">Profile picture</strong> — if you upload one.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">2. How we use it</h2>
+      <p>Your data is used only to operate Ledger: authenticating you, displaying your board, calculating your stats, and generating the CSV export you request. We do not sell your data, and we do not use it for advertising.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">3. Who we share it with</h2>
+      <p class="mb-3">Ledger relies on a small number of infrastructure providers to function:</p>
+      <ul class="list-disc pl-5 space-y-1.5">
+        <li><strong class="text-[#37352f]">Supabase</strong> — hosts our database and handles authentication (including password hashing and Google OAuth).</li>
+        <li><strong class="text-[#37352f]">Google</strong> — provides Google Sign-In if you choose to use it.</li>
+      </ul>
+      <p class="mt-3">These providers process data on our behalf and don't use it for their own purposes. We don't share your data with anyone else.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">4. Cookies &amp; sessions</h2>
+      <p>Ledger uses a session cookie to keep you logged in. It's required for the app to work and isn't used for tracking or advertising.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">5. Data retention</h2>
+      <p>We keep your data for as long as your account is active. Archived applications are kept (not deleted) so you can restore them, until you delete your account.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">6. Your rights</h2>
+      <p>You can export your full application history as a CSV at any time from your dashboard. You can permanently delete your account and all associated data from your profile page — this action is immediate and cannot be undone.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">7. Changes to this policy</h2>
+      <p>If this policy changes in a meaningful way, we'll update the date at the top of this page.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-[#37352f] mb-3">8. Contact</h2>
+      <p>Questions about this policy or your data? Reach out through the contact details on our landing page.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="border-t border-neutral-100">
+  <div class="mx-auto max-w-3xl px-4 py-10 flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="font-bold text-lg">Ledger</p>
+    <p class="text-xs text-neutral-400">© 2026 Ledger. Track it, don't lose it.</p>
+  </div>
+</footer>
+
+</body>
+</html>
