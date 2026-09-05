@@ -372,6 +372,47 @@ def check_username():
         return {'available': False}
     return {'available': not bool(Profile.query.filter_by(username=username).first())}
 
+# ----------Forgot/Reset Password ---------
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        try:
+            supabase.auth.reset_password_for_email(
+                email,
+                options={"redirect_to": request.url_root.rstrip('/') + 'reset-password'}
+            )
+        except Exception:
+            pass  # never reveal whether the email exists
+        flash('If an account exists for that email, a reset link has been sent.', 'success')
+        return redirect(url_for('login'))
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password', methods=['GET'])
+def reset_password():
+    # Supabase redirects here with the recovery token in the URL hash fragment,
+    # which only JS on the page can read — see reset_password.html
+    return render_template('reset_password.html')
+
+
+@app.route('/reset-password/update', methods=['POST'])
+def reset_password_update():
+    access_token = request.form.get('access_token', '')
+    refresh_token = request.form.get('refresh_token', '')
+    new_password = request.form.get('password', '')
+
+    error = validate_password(new_password)
+    if error:
+        return {'success': False, 'message': error}, 400
+
+    try:
+        supabase.auth.set_session(access_token, refresh_token)
+        supabase.auth.update_user({"password": new_password})
+        return {'success': True}
+    except Exception as e:
+        return {'success': False, 'message': str(e)}, 400
+
 # ----------Google Auth----------
 @app.route('/auth/google')
 def auth_google():
