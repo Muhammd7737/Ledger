@@ -31,7 +31,10 @@
                            class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-black outline-none focus:border-black transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-neutral-600 mb-1">Password</label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-medium text-neutral-600">Password</label>
+                        <a href="{{ url_for('forgot_password') }}" class="text-xs text-neutral-400 hover:text-black transition-colors">Forgot password?</a>
+                    </div>
                     <input type="password" name="password" placeholder="••••••••" required
                            class="w-full rounded-xl bg-neutral-50 border border-neutral-200 px-3 py-2 text-black outline-none focus:border-black transition-all">
                 </div>
